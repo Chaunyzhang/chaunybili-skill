@@ -1,5 +1,9 @@
 # Chauny Bilibili Skill
 
+If another model will operate this repo, read this first:
+
+- `references/OPERATIONS-MANUAL.md`
+
 A consolidated Bilibili skill rebuilt from the upstream `bilibili-all-in-one` capability set, but now maintained as a self-contained local core inside this repository.
 
 ## Safety default
@@ -53,6 +57,8 @@ Read-only work is ready when:
 
 - `impl_package_exists: true`
 - `read_only_ready: true`
+
+Never skip the status check before choosing a workflow.
 
 ## Credentials
 

@@ -17,6 +17,8 @@ Always check status first:
 python scripts/bili_status.py --json
 ```
 
+Do not choose a workflow before the status check succeeds.
+
 ## Safety default
 
 Do not use publisher actions as the default workflow.
