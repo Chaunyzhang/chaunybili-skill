@@ -22,6 +22,10 @@ API_DANMAKU = f"{API_BASE}/x/v1/dm/list.so"
 API_SUBTITLE = f"{API_BASE}/x/player/v2"
 API_STAT = f"{API_BASE}/x/relation/stat"
 API_SEARCH = f"{API_BASE}/x/web-interface/search/type"
+API_COMMENTS = f"{API_BASE}/x/v2/reply"
+API_SPACE_INFO = f"{API_BASE}/x/space/wbi/acc/info"
+API_SPACE_VIDEOS = f"{API_BASE}/x/space/wbi/arc/search"
+API_NAV = f"{API_BASE}/x/web-interface/nav"
 
 # Video quality mapping
 QUALITY_MAP = {
@@ -235,3 +239,13 @@ def parse_video_url(url: str) -> Dict[str, Any]:
         }
 
     return {"platform": "unknown", "url": url}
+
+
+def extract_wbi_keys(nav_data: Dict[str, Any]) -> tuple[str, str]:
+    """Extract WBI img and sub keys from nav response."""
+    wbi_img = ((nav_data.get("data", {}) or {}).get("wbi_img", {}) or {})
+    img_url = wbi_img.get("img_url", "")
+    sub_url = wbi_img.get("sub_url", "")
+    img_key = os.path.splitext(os.path.basename(img_url))[0]
+    sub_key = os.path.splitext(os.path.basename(sub_url))[0]
+    return img_key, sub_key
