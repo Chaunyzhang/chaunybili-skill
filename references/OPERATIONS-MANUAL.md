@@ -6,7 +6,8 @@ This manual is written for weaker models and low-context operators.
 
 This repo is a self-contained Bilibili aggregated skill.
 
-It vendors the upstream `bilibili-all-in-one` implementation locally so the repo does not depend on a hardcoded external path.
+It no longer depends on a hardcoded external `bilibili-all-in-one` install path.
+Instead, it keeps a repo-owned local implementation subset under `bili_impl/`.
 
 Safe-by-default blocks:
 
@@ -31,8 +32,7 @@ python scripts/bili_status.py --json
 
 Read-only ready means:
 
-- `vendor_main_exists: true`
-- `vendor_src_exists: true`
+- `impl_package_exists: true`
 - `read_only_ready: true`
 
 ## 3. Safety default
@@ -127,7 +127,7 @@ python scripts/bili_transcribe.py "https://example.com/audio.wav"
 
 The old wrapper failed because it imported a hardcoded path outside the repo.
 
-This repo now vendors the code locally.
+This repo now owns the implementation subset locally.
 
 ### Some high-quality downloads may still need credentials
 

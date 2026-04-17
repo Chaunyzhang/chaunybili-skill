@@ -19,6 +19,11 @@ def main() -> None:
         result = run("player", "play", url=args.url, quality=args.quality, page=args.page)
     elif args.mode == "playurl":
         result = run("player", "get_playurl", url=args.url, quality=args.quality, page=args.page)
+        if "success" not in result:
+            result = {
+                "success": bool(result.get("play_type") or result.get("urls") or result.get("video_streams")),
+                **result,
+            }
     elif args.mode == "danmaku":
         result = run("player", "get_danmaku", url=args.url, page=args.page)
     else:

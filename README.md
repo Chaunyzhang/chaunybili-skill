@@ -1,6 +1,6 @@
 # Chauny Bilibili Skill
 
-A consolidated Bilibili skill built on top of the upstream `bilibili-all-in-one` capability layer, but made self-contained inside this repository.
+A consolidated Bilibili skill rebuilt from the upstream `bilibili-all-in-one` capability set, but now maintained as a self-contained local core inside this repository.
 
 ## Safety default
 
@@ -13,7 +13,7 @@ The following high-risk write operations are intentionally not exposed as first-
 - draft upload
 - scheduled publish
 
-The upstream capability still exists in vendored code, but this repo treats those actions as disabled by default.
+The upstream capability was absorbed into this repository's own local core, but write-heavy publisher actions are still treated as disabled by default.
 
 ## What this repo can do today
 
@@ -48,8 +48,7 @@ python scripts/bili_status.py --json
 
 Read-only work is ready when:
 
-- `vendor_main_exists: true`
-- `vendor_src_exists: true`
+- `impl_package_exists: true`
 - `read_only_ready: true`
 
 ## Credentials
