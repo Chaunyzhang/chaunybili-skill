@@ -13,10 +13,13 @@ Safe-by-default blocks:
 
 1. hot monitor
 2. media download
-3. stats and comparison
-4. subtitles
-5. playback and danmaku
-6. optional transcription
+3. search
+4. comments
+5. creator profile analysis
+6. stats and comparison
+7. subtitles
+8. playback and danmaku
+9. optional transcription
 
 Default disabled block:
 
@@ -89,6 +92,30 @@ python scripts/bili_hot.py --mode rank --category game --limit 10
 python scripts/bili_download.py "<url>" --format mp3
 python scripts/bili_download.py "<url>" --format mp4
 ```
+
+### Search
+
+```bash
+python scripts/bili_search.py "<keyword>" --page-size 10
+```
+
+### Comments
+
+```bash
+python scripts/bili_comments.py "<url_or_bvid>" --page-size 10 --sort 2
+```
+
+### Creator analysis
+
+```bash
+python scripts/bili_creator.py "<mid>" --mode profile
+```
+
+Important:
+
+- `--mode videos` is temporarily disabled.
+- Reason: the current path is too prone to risk controls or unstable non-JSON responses.
+- Re-enable only after a lower-risk, stable path is verified.
 
 ### Stats
 

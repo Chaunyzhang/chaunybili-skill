@@ -43,21 +43,42 @@ python scripts/bili_watch.py --mode stats "<bilibili_url_or_bvid>"
 python scripts/bili_watch.py --mode compare "<url1>,<url2>"
 ```
 
-## Workflow D: subtitles
+## Workflow D: search
+
+```bash
+python scripts/bili_search.py "<keyword>" --page-size 10
+```
+
+## Workflow E: comments
+
+```bash
+python scripts/bili_comments.py "<bilibili_url_or_bvid>" --page-size 10 --sort 2
+```
+
+## Workflow F: creator analysis
+
+```bash
+python scripts/bili_creator.py "<mid>" --mode profile
+```
+
+Do not use `--mode videos` by default.
+It is temporarily disabled until there is a lower-risk and more stable path.
+
+## Workflow G: subtitles
 
 ```bash
 python scripts/bili_subtitle.py --mode list "<bilibili_url_or_bvid>"
 python scripts/bili_subtitle.py --mode download "<bilibili_url_or_bvid>" --language zh-CN --format srt
 ```
 
-## Workflow E: playback and danmaku
+## Workflow H: playback and danmaku
 
 ```bash
 python scripts/bili_play.py --mode play "<bilibili_url_or_bvid>"
 python scripts/bili_play.py --mode danmaku "<bilibili_url_or_bvid>"
 ```
 
-## Workflow F: transcription
+## Workflow I: transcription
 
 ```bash
 python scripts/bili_transcribe.py "<local_or_remote_media_source>"

@@ -19,6 +19,9 @@ The upstream capability was absorbed into this repository's own local core, but 
 
 - hot/trending monitoring
 - video or audio downloading
+- keyword-based video search
+- video comments retrieval
+- creator profile analysis
 - video stats and comparison
 - subtitle listing/downloading/conversion/merge
 - playback URL, playlist, and danmaku fetching
@@ -82,6 +85,28 @@ python scripts/bili_hot.py --mode rank --category game --limit 10
 python scripts/bili_download.py "https://www.bilibili.com/video/BV1xx411c7mD" --format mp3
 python scripts/bili_download.py "https://www.bilibili.com/video/BV1xx411c7mD" --format mp4
 ```
+
+### Search
+
+```bash
+python scripts/bili_search.py "字幕君" --page-size 5
+```
+
+### Comments
+
+```bash
+python scripts/bili_comments.py "BV1xx411c7mD" --page-size 10 --sort 2
+```
+
+### Creator analysis
+
+```bash
+python scripts/bili_creator.py 1938616426 --mode profile
+```
+
+Note:
+
+- `--mode videos` is temporarily disabled in the aggregated skill because the current path is too prone to risk controls or unstable non-JSON responses.
 
 ### Stats and comparison
 
