@@ -1,0 +1,5 @@
+out/
+scripts/__pycache__/
+vendor/**/__pycache__/
+*.pyc
+*.credentials.json

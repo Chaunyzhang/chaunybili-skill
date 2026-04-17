@@ -1,20 +1,71 @@
 ---
 name: chaunybili-skill
-description: Chauny's Bilibili collection skill. Prefer audio-first when collecting B站 media, and fall back to video when audio download is unavailable or fails. Then verify the chosen file really exists. Use when the user wants to collect Bilibili media first, before any transcription or copywriting step. Do not use this skill for ASR or text generation.
+description: 一个聚合版 Bilibili 技能，包含热点监控、下载、数据分析、字幕、播放信息、可选 DashScope 转写等只读能力。默认禁用发布类写操作。适合弱模型按步骤执行：先检查状态，再选择热点、下载、字幕、播放或转写工作流。
 ---
 
-Read `references/workflow.md` before changing the workflow.
+# Chauny Bilibili Skill
 
-## Command
+Detailed operator manual:
+
+- `references/OPERATIONS-MANUAL.md`
+
+## First rule
+
+Always check status first:
 
 ```bash
-python scripts/download_bilibili_video.py "<bilibili_url>" "<optional_output_dir>"
+python scripts/bili_status.py --json
 ```
 
-## Hard rules
+## Safety default
 
-- Only do download and verification.
-- Prefer audio-first, video fallback.
-- Success requires a real local file with size > 0.
-- Do not mix in subtitles or transcription.
-- If verification fails, treat the run as failed.
+Do not use publisher actions as the default workflow.
+Treat this repo as read-mostly unless the user explicitly asks for a risky write operation and accepts the platform-risk tradeoff.
+
+## Workflow A: hot monitor
+
+```bash
+python scripts/bili_hot.py --mode hot --page-size 10
+python scripts/bili_hot.py --mode rank --category game --limit 10
+```
+
+## Workflow B: media download
+
+```bash
+python scripts/bili_download.py "<bilibili_url>" --format mp3
+python scripts/bili_download.py "<bilibili_url>" --format mp4
+```
+
+## Workflow C: stats and comparison
+
+```bash
+python scripts/bili_watch.py --mode stats "<bilibili_url_or_bvid>"
+python scripts/bili_watch.py --mode compare "<url1>,<url2>"
+```
+
+## Workflow D: subtitles
+
+```bash
+python scripts/bili_subtitle.py --mode list "<bilibili_url_or_bvid>"
+python scripts/bili_subtitle.py --mode download "<bilibili_url_or_bvid>" --language zh-CN --format srt
+```
+
+## Workflow E: playback and danmaku
+
+```bash
+python scripts/bili_play.py --mode play "<bilibili_url_or_bvid>"
+python scripts/bili_play.py --mode danmaku "<bilibili_url_or_bvid>"
+```
+
+## Workflow F: transcription
+
+```bash
+python scripts/bili_transcribe.py "<local_or_remote_media_source>"
+```
+
+## Weak-model rules
+
+1. Do not skip `bili_status.py`
+2. Assume read-only mode unless the user explicitly overrides it
+3. Prefer MP3 download first when the user only needs content collection
+4. Keep publisher capability disabled in normal runs
