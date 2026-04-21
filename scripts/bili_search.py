@@ -17,6 +17,7 @@ if str(ROOT) not in sys.path:
 
 from bili_impl.auth import BilibiliAuth
 from bili_impl.utils import API_SEARCH, DEFAULT_HEADERS, extract_bvid, format_duration, format_number
+from bili_core import capability_gate
 
 
 def build_client() -> httpx.Client:
@@ -143,6 +144,11 @@ def search_videos_web(keyword: str, page: int = 1, page_size: int = 10) -> dict[
 
 
 def main() -> None:
+    gate = capability_gate("search")
+    if not gate.get("ready"):
+        print(json.dumps({"success": False, "message": gate.get("message"), "prepare_summary": gate.get("prepare_summary")}, ensure_ascii=False, indent=2))
+        raise SystemExit(1)
+
     parser = argparse.ArgumentParser(description="Bilibili search workflow")
     parser.add_argument("keyword")
     parser.add_argument("--page", type=int, default=1)

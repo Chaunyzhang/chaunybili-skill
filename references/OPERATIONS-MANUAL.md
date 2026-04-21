@@ -31,6 +31,7 @@ Always run:
 
 ```bash
 python scripts/bili_status.py --json
+python scripts/bili_prepare.py
 ```
 
 Read-only ready means:

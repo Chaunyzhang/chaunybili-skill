@@ -17,6 +17,12 @@ Always check status first:
 python scripts/bili_status.py --json
 ```
 
+Then prepare the reusable workflow state:
+
+```bash
+python scripts/bili_prepare.py
+```
+
 Do not choose a workflow before the status check succeeds.
 
 ## Safety default

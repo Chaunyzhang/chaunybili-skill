@@ -19,6 +19,7 @@ if hasattr(sys.stderr, "reconfigure"):
 
 from bili_impl.auth import BilibiliAuth
 from bili_impl.utils import API_COMMENTS, API_VIDEO_INFO, DEFAULT_HEADERS, extract_bvid
+from bili_core import capability_gate
 
 
 def build_client() -> httpx.Client:
@@ -104,6 +105,11 @@ def fetch_comments(url_or_bvid: str, page: int = 1, page_size: int = 10, sort: i
 
 
 def main() -> None:
+    gate = capability_gate("comments")
+    if not gate.get("ready"):
+        print(json.dumps({"success": False, "message": gate.get("message"), "prepare_summary": gate.get("prepare_summary")}, ensure_ascii=False, indent=2))
+        raise SystemExit(1)
+
     parser = argparse.ArgumentParser(description="Bilibili comments workflow")
     parser.add_argument("target", help="Bilibili URL or BV id")
     parser.add_argument("--page", type=int, default=1)

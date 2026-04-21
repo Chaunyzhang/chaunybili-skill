@@ -4,10 +4,15 @@ from __future__ import annotations
 import argparse
 import json
 
-from bili_core import run
+from bili_core import capability_gate, run
 
 
 def main() -> None:
+    gate = capability_gate("hot")
+    if not gate.get("ready"):
+        print(json.dumps({"success": False, "message": gate.get("message"), "prepare_summary": gate.get("prepare_summary")}, ensure_ascii=False, indent=2))
+        raise SystemExit(1)
+
     parser = argparse.ArgumentParser(description="Bilibili hot monitor workflow")
     parser.add_argument("--mode", choices=["hot", "trending", "weekly", "rank"], default="hot")
     parser.add_argument("--limit", type=int, default=10)

@@ -4,6 +4,7 @@ import asyncio
 import json
 import os
 import sys
+import hashlib
 from pathlib import Path
 from typing import Any
 
@@ -16,11 +17,13 @@ ROOT = Path(__file__).resolve().parent.parent
 IMPL_ROOT = ROOT / "bili_impl"
 DATA_DIR = Path.home() / ".local" / "share" / "chaunybili-skill"
 CREDENTIALS_PATH = DATA_DIR / "credentials.json"
+PREP_STATE = DATA_DIR / "prepare-state.json"
 
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from bili_impl import BilibiliAuth, BilibiliDownloader, BilibiliPlayer, BilibiliWatcher, HotMonitor, SubtitleDownloader  # noqa: E402
+from prepare_state import read_prepare_state
 
 
 DISABLED_WRITE_MODULES = {
@@ -117,7 +120,7 @@ def run(module: str, action: str, **kwargs) -> dict[str, Any]:
 def health_snapshot() -> dict[str, Any]:
     ensure_directories()
     creds = read_credentials()
-    return {
+    payload = {
         "data_dir": str(DATA_DIR),
         "impl_root": str(IMPL_ROOT),
         "impl_package_exists": (IMPL_ROOT / "__init__.py").is_file(),
@@ -128,3 +131,62 @@ def health_snapshot() -> dict[str, Any]:
         "publish_ready": bool(creds.get("sessdata")) and bool(creds.get("bili_jct")),
         "write_actions_default": "disabled",
     }
+    payload["runtime_signature"] = runtime_signature_from_snapshot(payload)
+    payload["prepare_state"] = prepare_state_summary(payload)
+    payload["prepared_workflows_ready"] = payload["prepare_state"].get("prepared_workflows_ready", False)
+    payload["all_ready"] = bool(payload["read_only_ready"] and payload["prepare_state"].get("state_exists") and payload["prepare_state"].get("signature_matches") and payload["prepared_workflows_ready"])
+    return payload
+
+
+def runtime_signature_from_snapshot(snapshot: dict[str, Any]) -> dict[str, Any]:
+    signature = {
+        "impl_package_exists": snapshot.get("impl_package_exists"),
+        "credentials_file_exists": snapshot.get("credentials_file_exists"),
+        "sessdata_present": snapshot.get("sessdata_present"),
+        "publish_ready": snapshot.get("publish_ready"),
+    }
+    digest = hashlib.sha256(json.dumps(signature, ensure_ascii=False, sort_keys=True).encode("utf-8")).hexdigest()
+    return {**signature, "digest": digest}
+
+
+def prepare_state_summary(snapshot: dict[str, Any]) -> dict[str, Any]:
+    state = read_prepare_state(PREP_STATE)
+    current_signature = runtime_signature_from_snapshot(snapshot)
+    saved_signature = state.get("runtime_signature", {}) if isinstance(state, dict) else {}
+    signature_matches = bool(saved_signature) and saved_signature.get("digest") == current_signature.get("digest")
+    capabilities = state.get("capabilities", {}) if isinstance(state, dict) else {}
+    return {
+        "state_file": str(PREP_STATE),
+        "state_exists": PREP_STATE.is_file(),
+        "updated_at": state.get("updated_at"),
+        "signature_matches": signature_matches,
+        "capabilities": capabilities,
+        "blockers": state.get("blockers", []),
+        "prepared_workflows_ready": bool(capabilities) and all(bool((capabilities.get(name) or {}).get("ready")) for name in ["hot", "download", "search", "comments", "watch", "subtitles", "player"]),
+    }
+
+
+def capability_gate(capability: str) -> dict[str, Any]:
+    snapshot = health_snapshot()
+    prepare_summary = snapshot.get("prepare_state", {})
+    capabilities = prepare_summary.get("capabilities", {})
+    capability_state = capabilities.get(capability) if isinstance(capabilities, dict) else None
+    if not prepare_summary.get("state_exists"):
+        return {
+            "ready": False,
+            "message": f"No prepare-state file found. Run python scripts/bili_prepare.py before using the {capability} workflow.",
+            "prepare_summary": prepare_summary,
+        }
+    if not prepare_summary.get("signature_matches"):
+        return {
+            "ready": False,
+            "message": f"Prepare-state no longer matches the current Bilibili environment. Rerun python scripts/bili_prepare.py before using the {capability} workflow.",
+            "prepare_summary": prepare_summary,
+        }
+    if not isinstance(capability_state, dict) or not capability_state.get("ready"):
+        return {
+            "ready": False,
+            "message": (capability_state or {}).get("message") or f"{capability} is not prepared yet. Run python scripts/bili_prepare.py.",
+            "prepare_summary": prepare_summary,
+        }
+    return {"ready": True, "message": "", "prepare_summary": prepare_summary}

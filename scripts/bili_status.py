@@ -9,7 +9,6 @@ from bili_core import health_snapshot
 
 def main() -> None:
     snapshot = health_snapshot()
-    snapshot["all_ready"] = snapshot["read_only_ready"]
 
     if "--json" in sys.argv:
         print(json.dumps(snapshot, ensure_ascii=False, indent=2))

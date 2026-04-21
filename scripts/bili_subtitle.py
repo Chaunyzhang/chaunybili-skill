@@ -5,10 +5,15 @@ import argparse
 import json
 from pathlib import Path
 
-from bili_core import run
+from bili_core import capability_gate, run
 
 
 def main() -> None:
+    gate = capability_gate("subtitles")
+    if not gate.get("ready"):
+        print(json.dumps({"success": False, "message": gate.get("message"), "prepare_summary": gate.get("prepare_summary")}, ensure_ascii=False, indent=2))
+        raise SystemExit(1)
+
     parser = argparse.ArgumentParser(description="Bilibili subtitle workflow")
     parser.add_argument("--mode", choices=["list", "download", "convert", "merge"], default="list")
     parser.add_argument("target")

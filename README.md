@@ -53,6 +53,14 @@ Needed only for:
 python scripts/bili_status.py --json
 ```
 
+## Prepare workflows
+
+```bash
+python scripts/bili_prepare.py
+```
+
+This writes a persistent prepare-state for the read-only workflows so later agents can resume from known readiness state instead of guessing.
+
 Read-only work is ready when:
 
 - `impl_package_exists: true`
